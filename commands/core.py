@@ -16,9 +16,10 @@ def read_command():
     is_valid, error = validate_input(tokens)
 
     if is_valid:
-        execute_command(tokens)
+        return execute_commands(tokens)
     else:
         print(error)
+        return None
 
 
 def pop_element_from_stack(command_token_list):
@@ -40,6 +41,11 @@ def validate_input(tokens):
 
     if len(tokens) == 0:
         return True, None
+
+    is_valid_cmd, cmd = is_valid_command(tokens[0])
+
+    if not is_valid_cmd:
+        return False, tokens[0] + " is not a valid command"
 
     for token in tokens:
         is_valid_cmd, cmd = is_valid_command(token)
@@ -74,5 +80,52 @@ def validate_input(tokens):
     return True, None
 
 
-def execute_command(tokens):
-    pass
+MAX_STACK_DEPTH = 64
+
+
+def execute_commands(tokens):
+    if len(tokens) == 0:
+        return None
+
+    stack = []
+    max_depth = 0
+    return execute_command(stack, tokens, max_depth)
+
+
+def execute_command(stack, tokens, max_depth):
+    max_depth = max_depth + 1
+
+    if max_depth > MAX_STACK_DEPTH:
+        raise Exception("Stack overflow")
+
+    token = tokens.pop(0)
+
+    is_valid_cmd, cmd = is_valid_command(token)
+
+    if is_valid_cmd:
+        token_item = TokenItem(token, True, cmd.num_params)
+        token_item.cmd = cmd
+        stack.append(token_item)
+    elif is_valid_variable_name(token):
+        return token
+
+    if len(stack) > 0:
+        root_cmd = stack[-1]
+
+        for _ in range(root_cmd.num_params):
+            param = execute_command(stack, tokens, max_depth)
+
+            if param is None:
+                raise Exception("Not enough parameters for command: " + root_cmd.token)
+
+            root_cmd.param_list.append(param)
+
+        value, error = root_cmd.cmd.execute(root_cmd.param_list)
+
+        if error is not None:
+            print(error)
+            return None
+
+        stack.pop()
+
+    return value

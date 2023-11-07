@@ -105,3 +105,15 @@ class TestValidatInput(unittest.TestCase):
         is_valid, error = validate_input(tokens)
         self.assertFalse(is_valid)
         self.assertEqual(error, "Too few parameters for command: dot")
+
+    def test_valid_input_invalid6(self):
+        command = "A dot B C"
+        tokens = get_tokens(command)
+        is_valid, error = validate_input(tokens)
+        self.assertFalse(is_valid)
+        self.assertEqual(error, "A is not a valid command")
+
+
+class TestExecuteCommand(unittest.TestCase):
+    def test_execute_command_read(self):
+        pass

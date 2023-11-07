@@ -4,6 +4,7 @@ class TokenItem:
         self.is_cmd = is_cmd
         self.num_params = num_params
         self.param_list = []
+        self.cmd = None
 
 
 def get_tokens(command):
@@ -15,5 +16,5 @@ def get_tokens(command):
     command = command.replace(")", "")
 
     tokens = command.split()
-    
+
     return tokens
