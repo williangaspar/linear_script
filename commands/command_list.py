@@ -27,7 +27,9 @@ command_list.append(Command("read", "Read variable. Ex: Read A", 1, read_variabl
 command_list.append(
     Command("load", "Load previously saved variable. Ex: load A", 1, load_variable)
 )
-command_list.append(Command("store", "Clear the screen.", 1, store_variable, True))
+command_list.append(
+    Command("store", "Clear the screen.", 1, store_variable, is_void=True)
+)
 command_list.append(
     Command("set", "Set a variable. Ex: set A B", 2, set_variable_command)
 )
@@ -44,7 +46,9 @@ command_list.append(
 )
 
 
-command_list.append(Command("help", "Print this help message.", 0, print_help, True))
-command_list.append(Command("quit", "Exit the program.", 0, quit, True))
+command_list.append(
+    Command("help", "Print this help message.", 0, print_help, is_void=True)
+)
+command_list.append(Command("quit", "Exit the program.", 0, quit, is_void=True))
 
 command_list.append(Command("solve", "Solve a system of equations.", 0, None))

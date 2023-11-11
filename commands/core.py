@@ -1,4 +1,4 @@
-from commands.tokens import TokenItem, get_tokens
+from commands.tokens import SyntaxToken, TokenItem, get_tokens
 from commands.variables import is_valid_variable_name
 from .command_list import command_list
 
@@ -13,7 +13,7 @@ def is_valid_command(command):
 def read_command():
     command = input(">> ")
     tokens = get_tokens(command)
-    is_valid = True  # error = validate_input(tokens)
+    is_valid, error = validate_input(tokens.copy())
 
     if is_valid:
         return execute_commands(tokens)
@@ -22,65 +22,82 @@ def read_command():
         return None
 
 
-def pop_element_from_stack(command_token_list):
-    if len(command_token_list) > 0:
-        top_cmd = command_token_list[-1]
-        if len(top_cmd.param_list) == top_cmd.num_params:
-            name = top_cmd.token
-            command_token_list.pop()
-
-            if len(command_token_list) > 0:
-                top_cmd = command_token_list[-1]
-                top_cmd.param_list.append(name)
-
-    return command_token_list
+MAX_STACK_DEPTH = 16
 
 
 def validate_input(tokens):
-    command_token_list = []
-
     if len(tokens) == 0:
         return True, None
 
-    is_valid_cmd, cmd = is_valid_command(tokens[0])
+    root_token = tokens.pop(0)
 
-    if not is_valid_cmd:
-        return False, tokens[0] + " is not a valid command"
+    is_valid_cmd, cmd = is_valid_command(root_token)
 
-    for token in tokens:
-        is_valid_cmd, cmd = is_valid_command(token)
-        if is_valid_cmd:
-            command_token_list = pop_element_from_stack(command_token_list)
-            command_token_list.append(TokenItem(token, True, cmd.num_params))
-        elif is_valid_variable_name(token):
-            top_cmd = command_token_list[-1]
+    max_depth = 0
 
-            if len(top_cmd.param_list) == top_cmd.num_params:
-                return False, "Too many parameters for command: " + top_cmd.token
+    if is_valid_cmd:
+        root = SyntaxToken(root_token, True, cmd.num_params)
 
-            top_cmd.param_list.append(token)
+        try:
+            for _ in range(root.num_params):
+                token = make_tree(tokens, root, max_depth)
 
-        else:
-            return False, "Invalid token: " + token
+                if token is not None:
+                    is_valid_cmd, cmd = is_valid_command(token)
 
-    # Clear stack
-    len_command_token_list = len(command_token_list)
+                    if not is_valid_cmd:
+                        root.param_list.append(token)
 
-    counter = 0
+            if len(root.param_list) < root.num_params:
+                return False, "Not enough parameters for command: " + root_token
 
-    while counter < len_command_token_list and len(command_token_list):
-        counter = counter + 1
-        command_token_list = pop_element_from_stack(command_token_list)
+            if len(tokens) > 0:
+                return False, "Too many parameters for command: " + root_token
 
-    # If there still any elements in the list there is probably an error
-    for token in command_token_list:
-        if token.num_params > len(token.param_list):
-            return False, "Too few parameters for command: " + token.token
+        except Exception as e:
+            return False, str(e)
 
-    return True, None
+        return True, None
+    else:
+        return False, root_token + " is not a valid command"
 
 
-MAX_STACK_DEPTH = 64
+def make_tree(tokens, root, max_depth):
+    if max_depth > MAX_STACK_DEPTH:
+        raise Exception("Stack overflow")
+
+    max_depth = max_depth + 1
+
+    if len(tokens) == 0:
+        return None
+
+    token = tokens.pop(0)
+
+    is_valid_cmd, cmd = is_valid_command(token)
+
+    if is_valid_cmd:
+        if cmd.is_void:
+            raise Exception(
+                token + " is a void command and cannot be used as a parameter",
+            )
+
+        sintax_token = SyntaxToken(token, True, cmd.num_params)
+        sintax_token.cmd = cmd
+        root.param_list.append(sintax_token)
+
+        for _ in range(sintax_token.num_params):
+            value = make_tree(tokens, sintax_token, max_depth)
+
+            if value is None:
+                raise Exception("Not enough parameters for command: " + root.token)
+
+            sintax_token.param_list.append(value)
+
+        return sintax_token.token
+    elif is_valid_variable_name(token):
+        return token
+    else:
+        raise Exception("Invalid token: " + token)
 
 
 def execute_commands(tokens):
@@ -89,10 +106,10 @@ def execute_commands(tokens):
 
     stack = []
     max_depth = 0
-    return execute_command(stack, tokens, max_depth)
+    return execute_command_stack(stack, tokens, max_depth)
 
 
-def execute_command(stack, tokens, max_depth):
+def execute_command_stack(stack, tokens, max_depth):
     max_depth = max_depth + 1
 
     if max_depth > MAX_STACK_DEPTH:
@@ -113,7 +130,7 @@ def execute_command(stack, tokens, max_depth):
         root_cmd = stack[-1]
 
         for _ in range(root_cmd.num_params):
-            param = execute_command(stack, tokens, max_depth)
+            param = execute_command_stack(stack, tokens, max_depth)
 
             if param is None:
                 raise Exception("Not enough parameters for command: " + root_cmd.token)

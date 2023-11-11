@@ -1,6 +1,7 @@
 import unittest
-from commands.command_list import command_list
+from unittest.mock import patch
 
+from commands.command_list import command_list
 from commands.core import is_valid_command, validate_input
 from commands.tokens import get_tokens
 
@@ -71,12 +72,40 @@ class TestValidatInput(unittest.TestCase):
         self.assertTrue(is_valid)
         self.assertIsNone(error)
 
+    def test_valid_input_valid5(self):
+        command = "set P dot A transp A"
+        tokens = get_tokens(command)
+        is_valid, error = validate_input(tokens)
+        self.assertTrue(is_valid)
+        self.assertIsNone(error)
+
+    def test_valid_input_valid6(self):
+        command = "set P dot (dot A [inv dot transp A A]) transp A"
+        tokens = get_tokens(command)
+        is_valid, error = validate_input(tokens)
+        self.assertTrue(is_valid)
+        self.assertIsNone(error)
+
+    def test_valid_input_valid7(self):
+        command = "quit"
+        tokens = get_tokens(command)
+        is_valid, error = validate_input(tokens)
+        self.assertTrue(is_valid)
+        self.assertIsNone(error)
+
+    def test_valid_input_valid8(self):
+        command = "print A"
+        tokens = get_tokens(command)
+        is_valid, error = validate_input(tokens)
+        self.assertTrue(is_valid)
+        self.assertIsNone(error)
+
     def test_valid_input_invalid(self):
         command = "det"
         tokens = get_tokens(command)
         is_valid, error = validate_input(tokens)
         self.assertFalse(is_valid)
-        self.assertEqual(error, "Too few parameters for command: det")
+        self.assertEqual(error, "Not enough parameters for command: det")
 
     def test_valid_input_invalid2(self):
         command = "det A B"
@@ -93,7 +122,7 @@ class TestValidatInput(unittest.TestCase):
         self.assertEqual(error, "Invalid token: dott")
 
     def test_valid_input_invalid4(self):
-        command = "dot inv A B"
+        command = "inv A B"
         tokens = get_tokens(command)
         is_valid, error = validate_input(tokens)
         self.assertFalse(is_valid)
@@ -104,7 +133,7 @@ class TestValidatInput(unittest.TestCase):
         tokens = get_tokens(command)
         is_valid, error = validate_input(tokens)
         self.assertFalse(is_valid)
-        self.assertEqual(error, "Too few parameters for command: dot")
+        self.assertEqual(error, "Not enough parameters for command: dot")
 
     def test_valid_input_invalid6(self):
         command = "A dot B C"
@@ -112,6 +141,23 @@ class TestValidatInput(unittest.TestCase):
         is_valid, error = validate_input(tokens)
         self.assertFalse(is_valid)
         self.assertEqual(error, "A is not a valid command")
+
+    def test_valid_input_invalid7(self):
+        command = "set A print C"
+        tokens = get_tokens(command)
+        is_valid, error = validate_input(tokens)
+        self.assertFalse(is_valid)
+        self.assertEqual(
+            error, "print is a void command and cannot be used as a parameter"
+        )
+
+    @patch("commands.core.MAX_STACK_DEPTH", 2)
+    def test_valid_input_invalid_stack_over_flow(self):
+        command = "set P dot (dot A [inv dot transp A A]) transp A"
+        tokens = get_tokens(command)
+        is_valid, error = validate_input(tokens)
+        self.assertFalse(is_valid)
+        self.assertEqual(error, "Stack overflow")
 
 
 class TestExecuteCommand(unittest.TestCase):
