@@ -13,7 +13,7 @@ def is_valid_command(command):
 def read_command():
     command = input(">> ")
     tokens = get_tokens(command)
-    is_valid, error = validate_input(tokens)
+    is_valid = True  # error = validate_input(tokens)
 
     if is_valid:
         return execute_commands(tokens)

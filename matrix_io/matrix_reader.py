@@ -1,4 +1,4 @@
-from numpy import array, insert
+from sympy import Matrix
 from fractions import Fraction
 
 end_command = "END"
@@ -35,6 +35,6 @@ def read_matrix():
     if len(matrix) == 0:
         print("No matrix was read")
     else:
-        matrix = array(matrix)
+        matrix = Matrix(matrix)
 
     return matrix

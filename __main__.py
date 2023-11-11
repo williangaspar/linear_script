@@ -1,5 +1,6 @@
+import gnureadline
+import sympy
 from commands.core import read_command
-from matrix_io.matrix_printer import print_matrix
 
 
 def main():
@@ -9,7 +10,8 @@ def main():
         result = read_command()
 
         if result is not None:
-            print_matrix(result)
+            sympy.pprint(result)
+            print()
 
 
 if __name__ == "__main__":
