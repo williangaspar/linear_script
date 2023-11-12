@@ -1,5 +1,5 @@
 from commands.command import Command
-from commands.linear_algebra_commands import det, dot, rref, inv, transp
+from commands.linear_algebra_commands import det, dot, rref, inv, transp, eigVal
 
 from .variables_commands import (
     load_variable,
@@ -43,6 +43,7 @@ command_list.append(Command("rref", "Row reduce a matrix. Ex: rref A", 1, rref))
 command_list.append(Command("dot", "Dot product of 2 matrices. Ex: dot A B", 2, dot))
 command_list.append(Command("inv", "Invert a matrix is possible. Ex: inv A", 1, inv))
 command_list.append(Command("transp", "Transpose a matrix. Ex transp A", 1, transp))
+command_list.append(Command("eigVal", "Eigenvalues of a matrix. Ex eig A", 1, eigVal))
 command_list.append(
     Command("det", "Solves the determinant of a matrix. Ex: det A", 1, det)
 )
