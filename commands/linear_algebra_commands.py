@@ -57,6 +57,12 @@ def dot(params):
     if Error is not None:
         return None, Error
 
+    _, col_var_1 = variables[0].value.shape
+    _, col_var_2 = variables[1].value.shape
+
+    if col_var_1 == 1 and col_var_2 == 1:
+        return variables[0].value.dot(variables[1].value), None
+
     return variables[0].value @ variables[1].value, None
 
 
