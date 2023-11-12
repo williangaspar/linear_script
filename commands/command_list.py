@@ -22,6 +22,8 @@ def print_help(_params):
         print(cmd.name + " - " + cmd.description)
     print()
 
+    return None, None
+
 
 command_list.append(Command("read", "Read variable. Ex: Read A", 1, read_variable))
 command_list.append(
