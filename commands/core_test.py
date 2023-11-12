@@ -1,8 +1,11 @@
 import unittest
 from unittest.mock import patch
+from commands.command import Command
+import io
+import sys
 
 from commands.command_list import command_list
-from commands.core import is_valid_command, validate_input
+from commands.core import execute_commands, is_valid_command, validate_input
 from commands.tokens import get_tokens
 
 
@@ -161,5 +164,65 @@ class TestValidatInput(unittest.TestCase):
 
 
 class TestExecuteCommand(unittest.TestCase):
-    def test_execute_command_read(self):
-        pass
+    @patch("commands.core.MAX_STACK_DEPTH", 2)
+    def test_execute_command_stack_overflow(self):
+        command = "set P dot (dot A [inv dot transp A A]) transp A"
+        tokens = get_tokens(command)
+
+        with self.assertRaises(Exception) as e:
+            execute_commands(tokens)
+            assert str(e.value) == "Stack overflow"
+
+    def test_execute_command_not_enough_params(self):
+        command = "det"
+        tokens = get_tokens(command)
+
+        with self.assertRaises(Exception) as e:
+            execute_commands(tokens)
+            assert str(e.value) == "Not enough parameters for command: det"
+
+    def test_excute_command_call_command(self):
+        command = "TEST A B"
+        params_passed = []
+
+        def test_command(params):
+            params_passed.extend(params)
+            return None, None
+
+        command_list.append(Command("TEST", "Test command", 2, test_command))
+        tokens = get_tokens(command)
+        execute_commands(tokens)
+        self.assertEqual(params_passed, ["A", "B"])
+        command_list.pop()
+
+    def test_execute_command_return_value(self):
+        command = "TEST A B"
+        params_passed = []
+
+        def test_command(params):
+            params_passed.extend(params)
+            return "Test", None
+
+        command_list.append(Command("TEST", "Test command", 2, test_command))
+        tokens = get_tokens(command)
+        result = execute_commands(tokens)
+        self.assertEqual(result, "Test")
+        command_list.pop()
+
+    def test_execute_command_print_error(self):
+        command = "TEST A B"
+        params_passed = []
+
+        capturedOutput = io.StringIO()
+        sys.stdout = capturedOutput
+
+        def test_command(params):
+            params_passed.extend(params)
+            return None, "Error 123"
+
+        command_list.append(Command("TEST", "Test command", 2, test_command))
+        tokens = get_tokens(command)
+        result = execute_commands(tokens)
+        self.assertIsNone(result)
+        self.assertTrue(capturedOutput.getvalue().find("Error 123") != -1)
+        command_list.pop()
