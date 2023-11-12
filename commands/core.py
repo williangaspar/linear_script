@@ -137,10 +137,14 @@ def execute_command_stack(stack, tokens, max_depth):
 
             root_cmd.param_list.append(param)
 
-        value, error = root_cmd.cmd.execute(root_cmd.param_list)
+        try:
+            value, error = root_cmd.cmd.execute(root_cmd.param_list)
 
-        if error is not None:
-            print(error)
+            if error is not None:
+                print(error)
+                return None
+        except Exception as e:
+            print(e)
             return None
 
         stack.pop()
