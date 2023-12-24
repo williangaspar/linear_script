@@ -1,10 +1,12 @@
 import sympy
 import json
+import os
 
 from commands.variables import get_variable, is_valid_variable_name, set_variable
 from matrix_io.matrix_reader import read_matrix
 
-VARAIBLE_JSON_FILE = "variables.data"
+REAL_PATH = os.path.dirname(os.path.dirname(__file__))
+VARAIBLE_JSON_FILE = os.path.join(REAL_PATH, "variables.data")
 
 
 def read_variable(params):
