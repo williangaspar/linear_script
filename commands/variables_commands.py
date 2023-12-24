@@ -85,8 +85,19 @@ def append_or_replace_to_file(file_name, variable_name, variable_value):
         if variable_name not in line:
             f.write(line)
 
-    f.write(variable_name + str(variable_value.tolist()) + "\n")
+    f.write(variable_name + str(variable_value).replace("'", '"') + "\n")
     f.close()
+
+
+def stringfyMatrix(matrix):
+    col, row = matrix.shape
+    new_matrix = []
+    for i in range(col):
+        for j in range(row):
+            new_row = []
+            new_row.append(str(matrix[i, j]))
+        new_matrix.append(new_row)
+    return new_matrix
 
 
 def store_variable(params):
@@ -102,7 +113,9 @@ def store_variable(params):
     if variable is None:
         return None, "Variable '" + variable_name + "' is not defined."
 
-    append_or_replace_to_file(VARAIBLE_JSON_FILE, variable_name, variable.value)
+    append_or_replace_to_file(
+        VARAIBLE_JSON_FILE, variable_name, stringfyMatrix(variable.value)
+    )
 
     return None, None
 
