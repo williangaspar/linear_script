@@ -1,5 +1,5 @@
 from commands.command import Command
-from commands.linear_algebra_commands import det, dot, rref, inv, transp, eigVal
+from commands.linear_algebra_commands import det, dot, rref, inv, transp, eigVal, add
 
 from .variables_commands import (
     load_variable,
@@ -55,3 +55,4 @@ command_list.append(
 command_list.append(Command("quit", "Exit the program.", 0, quit, is_void=True))
 
 command_list.append(Command("solve", "Solve a system of equations.", 0, None))
+command_list.append(Command("add", "Add two matrices.", 2, add))

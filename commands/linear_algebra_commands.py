@@ -111,3 +111,14 @@ def valida_variable(params):
             variables.append(variable)
 
     return variables, None
+
+def add(params):
+    variables, Error = valida_variable(params)
+
+    if Error is not None:
+        return None, Error
+
+    if len(variables) == 2:
+        return variables[0].value + variables[1].value, None
+
+    return None, "Could not add matrix."
