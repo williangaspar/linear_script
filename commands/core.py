@@ -133,7 +133,8 @@ def execute_command_stack(stack, tokens, max_depth):
             param = execute_command_stack(stack, tokens, max_depth)
 
             if param is None:
-                raise Exception("Not enough parameters for command: " + root_cmd.token)
+                print("Not enough parameters for command: " + root_cmd.token)
+                return None
 
             root_cmd.param_list.append(param)
 
