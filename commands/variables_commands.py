@@ -75,6 +75,7 @@ def set_variable_command(params):
 
 
 def append_or_replace_to_file(file_name, variable_name, variable_value):
+    print(file_name, variable_name)
     f = open(file_name, "r")
     lines = f.readlines()
     f.close()
@@ -89,12 +90,12 @@ def append_or_replace_to_file(file_name, variable_name, variable_value):
     f.close()
 
 
-def stringfyMatrix(matrix):
+def stringfy_matrix(matrix):
     col, row = matrix.shape
     new_matrix = []
     for i in range(col):
+        new_row = []
         for j in range(row):
-            new_row = []
             new_row.append(str(matrix[i, j]))
         new_matrix.append(new_row)
     return new_matrix
@@ -114,7 +115,7 @@ def store_variable(params):
         return None, "Variable '" + variable_name + "' is not defined."
 
     append_or_replace_to_file(
-        VARAIBLE_JSON_FILE, variable_name, stringfyMatrix(variable.value)
+        VARAIBLE_JSON_FILE, variable_name, stringfy_matrix(variable.value)
     )
 
     return None, None
