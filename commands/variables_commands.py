@@ -75,7 +75,6 @@ def set_variable_command(params):
 
 
 def append_or_replace_to_file(file_name, variable_name, variable_value):
-    print(file_name, variable_name)
     f = open(file_name, "r")
     lines = f.readlines()
     f.close()
