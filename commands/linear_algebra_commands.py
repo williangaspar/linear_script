@@ -3,7 +3,7 @@ from commands.variables import Variable, get_variable
 
 
 def det(params):
-    variables, Error = valida_variable(params)
+    variables, Error = validate_variable(params)
 
     if Error is not None:
         return None, Error
@@ -22,7 +22,7 @@ def det(params):
 
 
 def rref(params):
-    variables, Error = valida_variable(params)
+    variables, Error = validate_variable(params)
 
     if Error is not None:
         return None, Error
@@ -37,7 +37,7 @@ def rref(params):
 
 
 def dot(params):
-    variables, Error = valida_variable(params)
+    variables, Error = validate_variable(params)
 
     if Error is not None:
         return None, Error
@@ -52,7 +52,7 @@ def dot(params):
 
 
 def inv(params):
-    variables, Error = valida_variable(params)
+    variables, Error = validate_variable(params)
 
     if Error is not None:
         return None, Error
@@ -64,7 +64,7 @@ def inv(params):
 
 
 def transp(params):
-    variables, Error = valida_variable(params)
+    variables, Error = validate_variable(params)
 
     if Error is not None:
         return None, Error
@@ -73,7 +73,7 @@ def transp(params):
 
 
 def eigVal(params):
-    variables, Error = valida_variable(params)
+    variables, Error = validate_variable(params)
 
     if Error is not None:
         return None, Error
@@ -92,7 +92,7 @@ def solve():
     pass
 
 
-def valida_variable(params):
+def validate_variable(params):
     variables = []
     for param in params:
         variable_name = param
@@ -113,7 +113,7 @@ def valida_variable(params):
     return variables, None
 
 def add(params):
-    variables, Error = valida_variable(params)
+    variables, Error = validate_variable(params)
 
     if Error is not None:
         return None, Error
@@ -122,3 +122,25 @@ def add(params):
         return variables[0].value + variables[1].value, None
 
     return None, "Could not add matrix."
+
+def sub(params):
+    variables, Error = validate_variable(params)
+
+    if Error is not None:
+        return None, Error
+
+    if len(variables) == 2:
+        return variables[0].value - variables[1].value, None
+
+    return None, "Could not subtract matrix."
+
+def cross(params):
+    variables, Error = validate_variable(params)
+
+    if Error is not None:
+        return None, Error
+
+    if len(variables) == 2:
+        return variables[0].value.cross(variables[1].value), None
+
+    return None, "Could not cross product matrix."
