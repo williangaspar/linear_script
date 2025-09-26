@@ -16,6 +16,25 @@ class SyntaxToken:
         self.parent = None
 
 
+def is_numeric(token):
+    try:
+        float(token)
+        return True
+    except ValueError:
+        return False
+
+
+def get_numeric_value(token):
+    try:
+        # Try to convert to int first, then float
+        if '.' in token:
+            return float(token)
+        else:
+            return int(token)
+    except ValueError:
+        return None
+
+
 def get_tokens(command):
     # Brackets and parenthesis are allowed but do not count as tokens.
     # They serve as a guide to the user.

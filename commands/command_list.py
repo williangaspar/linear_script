@@ -1,5 +1,5 @@
 from commands.command import Command
-from commands.linear_algebra_commands import det, dot, rref, inv, transp, eigVal, add, sub, cross
+from commands.linear_algebra_commands import det, dot, rref, inv, transp, eigVal, add, sub, mult, cross
 
 from .variables_commands import (
     load_variable,
@@ -59,3 +59,4 @@ command_list.append(Command("solve", "Solve a system of equations.", 0, None))
 command_list.append(Command("add", "Add two matrices.", 2, add))
 command_list.append(Command("cross", "Cross product of two matrices.", 2, cross))
 command_list.append(Command("sub", "Subtract two matrices.", 2, sub))
+command_list.append(Command("mult", "Multiply two matrices or scale by scalar.", 2, mult, accepts_scalars=True))

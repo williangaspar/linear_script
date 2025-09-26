@@ -1,4 +1,4 @@
-from commands.tokens import SyntaxToken, TokenItem, get_tokens
+from commands.tokens import SyntaxToken, TokenItem, get_tokens, is_numeric
 from commands.variables import is_valid_variable_name
 from .command_list import command_list
 
@@ -96,6 +96,12 @@ def make_tree(tokens, root, max_depth):
         return sintax_token.token
     elif is_valid_variable_name(token):
         return token
+    elif is_numeric(token):
+        # Check if the parent command accepts scalars
+        if root is not None and hasattr(root, 'cmd') and root.cmd is not None:
+            if not root.cmd.accepts_scalars:
+                raise Exception("Command '" + root.token + "' does not accept scalar values")
+        return token
     else:
         raise Exception("Invalid token: " + token)
 
@@ -124,6 +130,13 @@ def execute_command_stack(stack, tokens, max_depth):
         token_item.cmd = cmd
         stack.append(token_item)
     elif is_valid_variable_name(token):
+        return token
+    elif is_numeric(token):
+        # Check if we're inside a command that accepts scalars
+        if len(stack) > 0:
+            current_cmd = stack[-1]
+            if not current_cmd.cmd.accepts_scalars:
+                raise Exception("Command '" + current_cmd.token + "' does not accept scalar values")
         return token
 
     if len(stack) > 0:
