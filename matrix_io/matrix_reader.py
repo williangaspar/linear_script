@@ -26,8 +26,8 @@ def read_matrix():
                 if number_of_columns == 0:
                     number_of_columns = len(fraction_row)
                     matrix.append(fraction_row)
-                if is_end_line:
-                    break
+                    if is_end_line:
+                        break
                 elif number_of_columns != len(fraction_row):
                     print(
                         "Invalid input. The matrix must have the same number of columns in each row. Please try again:"
