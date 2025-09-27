@@ -25,12 +25,12 @@ def print_help(_params):
     return None, None
 
 
-command_list.append(Command("read", "Read variable. Ex: Read A", 1, read_variable))
+command_list.append(Command("read", "Read variable. Ex: Read A >> 1 4 d ['d' ends the reading, return will read another line].", 1, read_variable))
 command_list.append(
     Command("load", "Load previously saved variable. Ex: load A", 1, load_variable)
 )
 command_list.append(
-    Command("store", "Clear the screen.", 1, store_variable, is_void=True)
+    Command("store", "Store a variable. Ex store A", 1, store_variable, is_void=True)
 )
 command_list.append(
     Command("set", "Set a variable. Ex: set A B", 2, set_variable_command)
